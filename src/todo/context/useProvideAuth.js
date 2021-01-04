@@ -20,7 +20,8 @@ export default function useProvideAuth() {
       });
 
       const resJson = await response.json();
-      setAuth({ resJson });
+      setAuth({ ...resJson });
+      return resJson;
     } catch (err) {
       console.log(err);
     }

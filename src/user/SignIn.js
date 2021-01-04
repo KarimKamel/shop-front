@@ -5,8 +5,10 @@ import { signIn, authenticate } from "../auth/index";
 import Message from "./Message";
 import { Redirect } from "react-router-dom";
 import { isAuthenticated } from "../auth";
+import { useAuth } from "../todo/context/ProvideAuth";
 
 export default function SignIn() {
+  const auth = useAuth();
   const [fields, setFields] = useState({
     name: "",
     password: "123456",
@@ -16,7 +18,9 @@ export default function SignIn() {
     redirectToReferrer: false,
   });
 
-  const { user } = isAuthenticated();
+  const {
+    auth: { user },
+  } = auth;
   const { name, password, email, error, loading, redirectToReferrer } = fields;
 
   const handleChange = event => {
@@ -32,22 +36,21 @@ export default function SignIn() {
     setFields({ ...fields, loading: true });
 
     const user = { email, password };
-    signIn(user).then(res => {
+    auth.signIn(user).then(res => {
       if (res.error) {
         return setFields({ ...fields, error: res.error });
       }
-      return authenticate(res, () => {
-        setFields({
-          name: "",
-          email: "",
-          password: "",
-          loading: false,
-          redirectToReferrer: true,
-          error: "",
-        });
+      return setFields({
+        name: "",
+        email: "",
+        password: "",
+        loading: false,
+        redirectToReferrer: true,
+        error: "",
       });
     });
   };
+
   const redirectUser = () => {
     if (fields.redirectToReferrer) {
       if (user && user.role === 1) return <Redirect to="/admin/dashboard" />;

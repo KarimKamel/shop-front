@@ -1,13 +1,15 @@
 import React from "react";
 import Layout from "../core/Layout";
-import { isAuthenticated } from "../auth";
+import { useAuth } from "../todo/context/ProvideAuth";
 import { Link } from "react-router-dom";
 
 export default function AdminDashboard() {
+  const auth = useAuth();
   const {
-    user: { _id, email, name, role },
-    token,
-  } = isAuthenticated();
+    auth: {
+      user: { _id, email, name, role },
+    },
+  } = auth;
 
   const adminLinks = () => {
     return (

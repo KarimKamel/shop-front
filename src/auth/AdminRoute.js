@@ -1,15 +1,22 @@
-import React, { Component } from "react";
+import React from "react";
 import { Route, Redirect } from "react-router-dom";
-import { isAuthenticated } from "./index";
+
+import { useAuth } from "../todo/context/ProvideAuth";
 
 export default function AdminRoute({ component: Component, ...rest }) {
+  const auth = useAuth();
+  const {
+    auth: {
+      user: { _id, email, name, role },
+    },
+  } = auth;
   return (
     <Route
       {...rest}
       render={props => {
-        return isAuthenticated() && isAuthenticated().user.role === 1 ? (
+        return _id && role === 1 ? (
           <Component {...props} />
-        ) : isAuthenticated().user.role === 0 ? (
+        ) : role === 0 ? (
           <Redirect
             to={{
               pathname: "/user/dashboard",

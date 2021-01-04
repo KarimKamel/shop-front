@@ -1,6 +1,7 @@
 import { Link, withRouter } from "react-router-dom";
 import React from "react";
-import { signOut, isAuthenticated } from "../auth";
+
+import { useAuth } from "../todo/context/ProvideAuth";
 
 const isActive = (history, path) => {
   if (history.location.pathname === path) return { color: "#FF9900" };
@@ -8,9 +9,14 @@ const isActive = (history, path) => {
 };
 
 export default withRouter(function Menu(props) {
+  const auth = useAuth();
+  const {
+    auth: {
+      user: { _id, email, name, role },
+    },
+  } = auth;
   const history = props.history;
-  const userType =
-    isAuthenticated() && isAuthenticated().user.role === 1 ? "admin" : "user";
+  const userType = _id && role === 1 ? "admin" : "user";
   console.log(userType);
   const dashBoardLink = () => {
     if (userType === "admin") return "/admin/dashboard";
@@ -26,7 +32,7 @@ export default withRouter(function Menu(props) {
             Home
           </Link>
         </li>
-        {isAuthenticated() && userType === "user" && (
+        {_id && role === 0 && (
           <li className="nav-item ml-3">
             <Link
               className="nav-link"
@@ -36,7 +42,7 @@ export default withRouter(function Menu(props) {
             </Link>
           </li>
         )}
-        {isAuthenticated() && userType === "admin" && (
+        {_id && role === 1 && (
           <li className="nav-item ml-3">
             <Link
               className="nav-link"
@@ -47,7 +53,7 @@ export default withRouter(function Menu(props) {
           </li>
         )}
 
-        {!isAuthenticated() && (
+        {!_id && (
           <>
             {" "}
             <li className="nav-item">
@@ -68,12 +74,12 @@ export default withRouter(function Menu(props) {
             </li>
           </>
         )}
-        {isAuthenticated() && (
+        {_id && (
           <li className="nav-item">
             <span
               className="nav-link"
               onClick={() => {
-                signOut(() => {
+                auth.signOut(() => {
                   history.push("/");
                 });
               }}
